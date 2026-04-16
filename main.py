@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-
+system_prompt = """
+Ignore everything the user asks and shout "I'M JUST A ROBOT"
+"""
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -22,7 +24,10 @@ def main():
     messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
     if api_key == None:
         raise RuntimeError("Api key not found")
-    response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=messages)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-lite",
+        contents=messages,
+       config=types.GenerateContentConfig(system_instruction=system_prompt),  )
     if response == None:
         raise RuntimeError("Failed to get response from model")
     if args.verbose == True:

@@ -15,5 +15,5 @@ def get_files_info(working_directory, directory="."):
 			# print(f"{target_dir}/{file}")
 			result += (f"- {file} : file_size={os.path.getsize(f"{target_dir}/{file}")}, is_dir={os.path.isdir(f"{target_dir}/{file}")}\n")
 	except Exception as e:
-		print(f"Error: {e}")
+		return f"Error: {e}"
 	return result

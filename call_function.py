@@ -57,7 +57,7 @@ schema_write_file = types.FunctionDeclaration(
                 type=types.Type.STRING,
                 description="Path for a file to write to, relative to the working directory",
             ),
-            "contents": types.Schema(
+            "content": types.Schema(
                 type=types.Type.STRING,
                 description="Data which shoul be written to a file",
             ),
@@ -72,15 +72,15 @@ from functions.run_python_file import *
 
 
 def call_function(function_call, verbose=False):
-	function_map = {
-    "get_file_content": get_file_content,
-	"get_file_info": get_files_info,
-	"write_file": write_file,
-	"run_pyton_file": run_python_file
+    function_map = {
+        "get_file_content": get_file_content,
+        "get_files_info": get_files_info,
+        "write_file": write_file,
+        "run_python_file": run_python_file,
     }
-	function_name = function_call.name or ""
-	if function_name == "":
-		return types.Content(
+    function_name = function_call.name or ""
+    if function_name == "" or function_name not in function_map:
+        return types.Content(
             role="tool",
             parts=[
                 types.Part.from_function_response(
@@ -89,9 +89,20 @@ def call_function(function_call, verbose=False):
                 )
             ],
         )
-	args = dict(function_call.args) if function_call.args else {}
-	if verbose == True:
-		print(f"Calling function: {function_call.name}({function_call.args})")
-	else:
-		print(f" - Calling function: {function_call.name}")
-		
+
+    args = dict(function_call.args) if function_call.args else {}
+    args["working_directory"] = "./calculator"
+    if verbose == True:
+        print(f"Calling function: {function_call.name}({function_call.args})")
+    else:
+        print(f" - Calling function: {function_call.name}")
+    function_result = function_map[function_name](**args)  # call a function
+    return types.Content(
+        role="tool",
+        parts=[
+            types.Part.from_function_response(
+                name=function_name,
+                response={"result": function_result},
+            )
+        ],
+    )

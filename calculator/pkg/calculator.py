@@ -1,5 +1,3 @@
-# calculator/pkg/calculator.py
-
 class Calculator:
     def __init__(self):
         self.operators = {
@@ -19,13 +17,11 @@ class Calculator:
         if not expression or expression.isspace():
             return None
         tokens = expression.strip().split()
-        return self._evaluate_infix(tokens)
-
-    def _evaluate_infix(self, tokens):
         values = []
         operators = []
-
-        for token in tokens:
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
             if token in self.operators:
                 while (
                     operators
@@ -39,6 +35,7 @@ class Calculator:
                     values.append(float(token))
                 except ValueError:
                     raise ValueError(f"invalid token: {token}")
+            i += 1
 
         while operators:
             self._apply_operator(operators, values)
@@ -59,3 +56,8 @@ class Calculator:
         b = values.pop()
         a = values.pop()
         values.append(self.operators[operator](a, b))
+
+
+# Example usage:
+# calculator = Calculator()
+# print(calculator.evaluate("3 + 7 * 2"))
